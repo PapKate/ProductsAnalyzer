@@ -80,6 +80,11 @@
         /// </summary>
         public int Stock { get; set; }
 
+        /// <summary>
+        /// A flag indicating whether the stock is managed or not
+        /// </summary>
+        public bool IsStockManaged { get; set; }
+
         #endregion
 
         #region Constructors

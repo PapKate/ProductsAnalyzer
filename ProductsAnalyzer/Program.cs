@@ -16,14 +16,12 @@ namespace ProductsAnalyzer
         /// <summary>
         /// The excel file path
         /// </summary>
-        public static string ExcelPath = "WooCommerce-Products-Export-2023-February-02-1530.xlsx";
+        public static string ExcelPath = "WooCommerce-Products-Export-2023-April-11-0857.xlsx";
 
-        public static string XMLFolderPath = "C:\\Users\\DK\\Desktop\\XMLtoExcel";
-
-        public static string BKTurningProductsPath = XMLFolderPath + "\\dc_bktuning.xml";
-        public static string CarnerProductsPath = XMLFolderPath + "\\dc_carner.xml";
-        public static string DigitalIQProductsPath = XMLFolderPath + "\\dc_digitaliq.xml";
-        public static string VisualAcousticsProductsPath = XMLFolderPath + "\\dc_visualacoustics.xml";
+        public static string BKTurningProductsPath = "dc_bktuning.xml";
+        public static string CarnerProductsPath = "dc_carner.xml";
+        public static string DigitalIQProductsPath = "dc_digitaliq.xml";
+        public static string VisualAcousticsProductsPath = "dc_visualacoustics.xml";
 
         #endregion
     }
@@ -108,9 +106,9 @@ namespace ProductsAnalyzer
             importer.Select(x => x.SKU, "D", value => value, false);
             importer.Select(x => x.ProductType, "E", value => value, false);
             importer.Select(x => x.RegularPrice, "AT", value => value.ToDouble(), false);
-            importer.Select(x => x.SalePrice, "AU", value => value.ToDouble(), false);
-            importer.Select(x => x.StockStatus, "AV", value => value, false);
-            importer.Select(x => x.Stock, "AW", value => value.ToInt(), false);
+            importer.Select(x => x.StockStatus, "AU", value => value, false);
+            importer.Select(x => x.Stock, "AV", value => value.ToInt(), false);
+            importer.Select(x => x.IsStockManaged, "AW", value => value.ToBool(), false);
 
             var resposne = await importer.ImportAsync(fileName);
 
@@ -119,6 +117,8 @@ namespace ProductsAnalyzer
         
         public static async void CreateExcelWithProductsNotInXML(IEnumerable<ExcelProduct> products)
         {
+            products = products.Where(x => x.IsStockManaged == false).ToList();
+
             var exporter = new Exporter<ExcelProduct>();
 
             exporter.Select(x => x.Id, "A");
@@ -127,7 +127,7 @@ namespace ProductsAnalyzer
             exporter.Select(x => x.SKU, "D");
             exporter.Select(x => x.ProductType, "E");
             exporter.Select(x => x.RegularPrice, "F");
-            exporter.Select(x => x.SalePrice, "G");
+            exporter.Select(x => x.IsStockManaged, "G");
             exporter.Select(x => x.StockStatus, "H");
             exporter.Select(x => x.Stock, "I");
 
@@ -136,7 +136,7 @@ namespace ProductsAnalyzer
             exporter.SetNumberColumnStyle(x => x.SalePrice);
             exporter.SetNumberColumnStyle(x => x.Stock);
 
-            await exporter.ExportAsync(products, "products.xlsx");
+            await exporter.ExportAsync(products, "productsApril.xlsx");
         }
 
         #endregion
